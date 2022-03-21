@@ -1,0 +1,28 @@
+---
+
+- name: install httpd
+  hosts: nodes
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+
+    - name: enable, run and not mask httpd.service
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+        masked: false
+
+    - name: update index.html
+      copy:
+        src: ./source/index.html
+        dest: /var/www/html/index.html
+    
+    - name: open 80 port
+      firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true

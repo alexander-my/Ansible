@@ -1,0 +1,21 @@
+---
+
+- name: purge httpd
+  hosts: nodes
+  tasks:
+    - name: remove httpd
+      yum:
+        name: httpd
+        state: absent
+
+    - name: remove index.html
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: close htto port
+      firewalld:
+        service: http
+        state: disabled
+        permanent: true
+        immediate: true

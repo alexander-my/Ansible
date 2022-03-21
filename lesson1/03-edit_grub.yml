@@ -1,0 +1,16 @@
+---
+- name: edit grub
+  hosts: nodes
+  
+  tasks:
+  - name: change /etc/default/grub
+    lineinfile:
+      path: /etc/default/grub   
+      state: present
+      backrefs: yes
+      regexp: '^(GRUB_CMDLINE_LINUX=(?!.* net.ifnames=0 biosdevname=0)\"[^\"]+)(\".*)'
+      line: '\1 net.ifnames=0 biosdevname=0\2'
+
+  - name: apply changes
+    command: grub2-mkconfig
+
