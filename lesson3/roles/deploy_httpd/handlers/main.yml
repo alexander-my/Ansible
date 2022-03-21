@@ -1,0 +1,4 @@
+---
+
+- name: reload_httpd
+  service: name=httpd state=reloaded

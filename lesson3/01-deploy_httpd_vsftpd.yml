@@ -1,0 +1,13 @@
+---
+
+- name: Deploy httpd
+  hosts: nodes
+  become: true
+  roles:
+    - role: deploy_httpd
+
+- name: Deploy vsftpd
+  hosts: nodes
+  become: true
+  roles:
+    - role: deploy_vsftpd

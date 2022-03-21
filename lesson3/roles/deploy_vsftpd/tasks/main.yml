@@ -1,0 +1,65 @@
+---
+
+ - name: install requirements
+   yum:
+     name: policycoreutils-python-utils
+     update_cache: "{{ yum_cache_state }}"
+     state: present
+
+ - name: install vsftpd
+   yum:
+     name: "{{ item }}"
+     update_cache: "{{ yum_cache_state }}"
+     state: "{{ vsftpd_package_state }}"
+   with_items:
+     - vsftpd
+   become: true
+
+ - name: allow anon write
+   seboolean:
+     name: ftpd_anon_write
+     state: "{{ ftpd_anon_write_state }}"
+     persistent: true
+   become: true
+ 
+ - name: copy vsftpd.conf
+   template:
+     src: templates/vsftpd.conf.j2
+     dest: /etc/vsftpd/vsftpd.conf
+   become: true
+   notify: restart_vsftpd
+ 
+ - name: ensure vsftpd is enabled and running
+   service:
+     name: vsftpd
+     state: "{{ vsftpd_state }}"
+     enabled: "{{ vsftpd_enabled }}"
+   become: true
+ 
+ - name: "create {{ anon_access }} dir"
+   file:
+     path: "{{ anon_access }}"
+     owner: ftp
+     group: ftp
+     mode: 0755
+     state: directory
+   become: true
+ 
+ - name: "create {{ anon_upload }} dir"
+   file:
+     path: "{{ anon_upload }}"
+     owner: ftp
+     group: ftp
+     mode: 0755
+     setype: public_content_rw_t
+     state: directory
+   become: true
+   notify: restart_vsftpd
+
+ - name: firewalld enable ports
+   firewalld:
+     zone: public
+     service: ftp
+     permanent: yes
+     state: enabled
+   notify: reload_firewalld

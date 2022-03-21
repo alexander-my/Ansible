@@ -1,0 +1,26 @@
+---
+
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+
+    - name: enable, run and not mask httpd.service
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+        masked: false
+
+    - name: update index.html
+      copy:
+        src: "{{ role_path }}/files/index.html"
+        dest: "{{ destination_directory }}/index.html"
+      notify: reload_httpd
+
+    - name: open 80 port
+      firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
