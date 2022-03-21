@@ -1,0 +1,6 @@
+---
+
+- name: Create users
+  hosts: nodes
+  roles:
+    - role: create_users
